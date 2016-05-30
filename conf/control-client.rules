@@ -1,0 +1,19 @@
+<trafficPattern>
+
+###P2P client
+ccmatch bittorrent m`^azver(.)$`	f/p2p/ p/Azureus/ v/$1/
+
+###mail client
+//X-Mailer: Lotus Notes Release 7.0.1 January 17, 2006
+
+###Web Browser
+;Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0) 
+ccmatch http m`User-Agent: Mozilla/4.0 \(compatible; MSIE (\d+\.\d+); Windows NT 5.0;?([^)]*)` f/browser/ p/Internet Explorer/ v/$1/ o/Windows 2000/ i/$2/ 
+ccmatch http m`User-Agent: Mozilla/4.0 \(compatible; MSIE (\d+\.\d+); Windows NT 5.1;?([^)]*)` f/browser/ p/Internet Explorer/ v/$1/ o/Windows XP/ 
+ccmatch http m`User-Agent: ([^\r]+)` p/$1/ f/browser/
+
+
+##CUPS
+ccmatch ipp m`ipp://([^/]+)/([^ ]+) "([^"]*)" "([^"]*)" "([^"]*)` f/printing/ p/$5/ d/printer/ h/$1/ i/queue:$2 location:$3 details: $4/
+
+</trafficPattern> 

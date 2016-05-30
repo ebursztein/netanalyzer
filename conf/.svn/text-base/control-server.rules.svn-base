@@ -1,0 +1,18 @@
+// NetAnalyzer Signatures file
+// Project page: http://code.google.com/p/netanalyzer/
+// Author: Elie Bursztein LSV, ENS-Cachan, CNRS, INRIA
+// Email: elie@bursztein.eu
+// Licence: GPL v2 
+// netAnalyzer is (C) Copyright 2008  by Elie Bursztein 
+<trafficPattern>
+##apache
+
+
+###PROXY
+;Via: 1.0 prosie7.aster.pl:8080 (squid/2.5.STABLE4-20031106)\r\n  ... X-Forwarded-For: 212.76.39.253\r\n
+scmatch http m`Via: +([^ ]+) +([^ ]+) +\(([^/]+)\/([^)]+)`s f/proxy/ v/$1/ h/$2/ p/$3/ v/$4/
+scmatch http m`Via: (d+\.\d+) +([^\r]+)`s f/proxy/ v/$1/ p/$2/
+;catch all proxy
+scmatch http m`Via:([^\r]+)`s f/proxy/ p/$1/
+
+</trafficPattern>

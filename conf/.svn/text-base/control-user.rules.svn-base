@@ -1,0 +1,10 @@
+// NetAnalyzer Signatures file
+// Project page: http://code.google.com/p/netanalyzer/
+// Author: Elie Bursztein LSV, ENS-Cachan, CNRS, INRIA
+// Email: elie@bursztein.eu
+// Licence: GPL v2 
+// netAnalyzer is (C) Copyright 2008  by Elie Bursztein 
+<trafficPattern>
+ucmatch n/a m`login=(\w+)` l/$1/ f/sql/ n/direct/
+ucmatch n/a m`From:(\w+)` l/s1/ f/mail/ n/indirect/
+</trafficPattern> 

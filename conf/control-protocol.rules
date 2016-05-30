@@ -1,0 +1,165 @@
+#argument
+# v for version
+# f for protocol familly (mandatory)
+# i for additionnal information
+# c to indicate if it shoud be crypted or not. Use the crypto algorithm or crypted is the algorithm is unknown or plain keyword as data values
+# some are taken from nmap nmap-service-probes configuration file
+<trafficPattern>
+
+
+#===file transfert===
+
+#MSN Tranfert
+pcmatch msn-filetransfer m`^(ver ([ -~]*)msnftp\x0d\x0aver msnftp\x0d\x0ausr|method msnmsgr:)` f/file transfert/ v/$1/ i/MSN (Micosoft Network) Messenger Filetransfers (MSNFTP and MSNSLP)/
+
+#FTP
+pcmatch ftp m/^220 Welcome to ([-.\w]+) FTP.*\r\n$/i i/$1/  f/file transfert/
+pcmatch ftp m/^220 ([-.\w]+) [-.\w ]+ftp.*\r\n$/i i/$1/  f/file transfert/
+pcmatch ftp m/^220-([-.\w]+) [-.\w ]+ftp.*\r\n220/i i/$1/  f/file transfert/
+pcmatch ftp m/^220 [-.\w ]+ftp.*\r\n$/i  f/file transfert/
+pcmatch ftp m/^220-[-.\w ]+ftp.*\r\n220/i  f/file transfert/
+pcmatch ftp m/^220[- ].*ftp server.*\r\n/i  f/file transfert/
+pcmatch ftp m/^220-\r?\n220 - ftp/i  f/file transfert/
+
+#news
+pcmatch nntp m|^200 [-\[\]\(\)!,/+:<>@.\w ]*nntp[-\[\]\(\)!,/+:<>@.\w ]*\r\n$| f/file transfert/ i/News Network transfert protocol/
+
+#samba
+pcmatch smb m`\xffsmb[\x72\x25]` f/file transfert/ i/SambaSMB - Server Message Block/
+
+#=== Web ===  
+;host
+pcmatch http m`GET [^ ]+ HTTP/(\d+\.\d+)` f/web/ v/$1/  i/HyperText Transfer Protocol - RFC 2616/ 
+pcmatch http m`HTTP/(\d+\.\d+) (\d+) (.+)` f/web/ v/$1/ i/HTTP server response $2 /
+
+#=== mail ===
+
+#smtp
+pcmatch smtp m`^220[\x09-\x0d -~]* (e?smtp|simple mail)` f/mail/  i/SMTP - Simple Mail Transfer Protocol - RFC 2821/
+pcmatch smtp m|^220[\s-].*?E?SMTP[^\r]*\r\n| f/mail/ i/SMTP - Simple Mail Transfer Protocol - RFC 2821/
+
+#pop3
+pcmatch pop3 m|^\+OK [-\[\]\(\)!,/+:<>@.\w ]+\r\n$| v/3/ f/mail/ i/POP3 - Post Office Protocol version 3 - RFC 1939/
+pcmatch pop3 m`^(\+ok |-err )` f/mail/ v/3/ i/POP3 - Post Office Protocol version 3 - RFC 1939/
+
+#imap
+pcmatch imap m`^(\* ok|a[0-9]+ noop)` f/mail/ i/IMAP - Internet Message Access Protocol/ 
+pcmatch imap m/^\* OK ([-.\w]+) [-.\w,:+ ]+imap[-.\w,:+ ]+\r\n$/i v/$1/ f/mail/
+pcmatch imap m/^\* OK [-.\w,:+ ]+imap[-.\w,:+ ]+\r\n$/i f/mail/
+
+
+#=== chat ===
+
+pcmatch irc m`^(nick[\x09-\x0d -~]*user[\x09-\x0d -~]*:|user[\x09-\x0d -~]*:[\x02-\x0d -~]*nick[\x09-\x0d -~]*\x0d\x0a)` f/chat/ i/IRC - Internet Relay Chat - RFC 1459/
+pcmatch msnmessenger m`ver ([0-9]+) msnp[1-9][0-9]? [\x09-\x0d -~]*cvr0\x0d\x0a$|usr 1 [!-~]+ [0-9. ]+\x0d\x0a$|ans 1 [!-~]+ [0-9. ]+\x0d\x0a$` i/MSN Messenger Microsoft Network chat client/ v/$1/ f/chat/
+pcmatch jabber m`<stream:stream[\x09-\x0d ][ -~]*[\x09-\x0d ]xmlns=['"]jabber` i/Jabber (XMPP) open instant messenger protocol RFC 3920/ f/chat/
+pcmatch yahoo m`^(ymsg|ypns|yhoo).?.?.?.?.?.?.?[lwt].*\xc0\x80` i/Yahoo messenger/ f/chat/
+pcmatch aim m`^(\*[\x01\x02].*\x03\x0b|\*\x01.?.?.?.?\x01)|flapon|toc_signon.*0x` i/AIM AOL instant messenger (OSCAR and TOC)/ f/chat/
+pcmatch qq m`^.?\x02.+\x03$` i/Tencent QQ Protocol - Chinese instant messenger protocol/ f/chat/ 
+
+#=== Interactive ===
+
+pcmatch ssh m`^SSH-([.0-9]+)-(.+)` f/interactive/ v/$1/ c/crypted/ i/$2/
+pcmatch vnc m/RFB \d\d(\d)\.\d\d\d\n/ v/$1/ f/interactive/ i/VNC server/
+pcmatch telnet m`^\xff[\xfb-\xfe].\xff[\xfb-\xfe].\xff[\xfb-\xfe]` f/interactive/ i/Telnet - RFC 854/
+pcmatch rlogin m`^[a-z][a-z0-9][a-z0-9]+/[1-9][0-9]?[0-9]?[0-9]?00` i/remote login  RFC 1282/ f/interactive/
+
+#=== Control version ===
+#control version
+pcmatch cvs m`^BEGIN (AUTH|VERIFICATION|GSSAPI) REQUEST\x0a` f/version_control/ i/CVS - Concurrent Versions System/ 
+pcmatch subversion m`^\( success \( 1 2 \(` f/version_control/ i/Subversion - a version control system/
+
+
+#=== Network mananagement ==
+
+pcmatch snmp m'^\x30\x2c\x02\x01\x01\x04.([-a-zA-Z0-9_]+)' f/mananagement/ v/v2c/ i/Community:$1/
+
+
+#=== P2P ===
+
+#Bit Torrent
+
+pcmatch bittorrent m`BT.SEARCH`				f/p2p/ 	i/Search/ 		[policy:continue]
+pcmatch bittorrent m`info_hash\d+:`			f/p2p/ 	i/Hash info/	[policy:continue]
+pcmatch bittorrent m`find_node\d+:`			f/p2p/ 	i/Find node/	[policy:continue]
+pcmatch bittorrent m`get_peer\d+:`			f/p2p/ 	i/Get peer/	
+pcmatch bittorrent m`^get /scrape?info_hash=`	f/p2p/	i/Tracker/
+
+pcmatch bittorrent m`\x13BitTorrent protocol` 												  	  f/p2p/ 	i/Handshake/
+pcmatch bittorrent m`\x13bittorrent protocol|d1:ad2:id20:|\x08'7P\)[RP]`  f/p2p/ 	i/Handshake/ 
+
+
+#Edonkey/Emule
+
+pcmatch edonkey m`^\xe3.{3}\x00\x4c` f/p2p/ i/Edonkey hello answer/  
+pcmatch edonkey m`^\xe3.{4}\x01\x10` f/p2p/ i/Edonkey hello/  
+
+;generic emule/edonkey
+
+pcmatch edonkey m`^[\xc5\xd4\xe3-\xe5].?.?.?.?([\x01\x02\x05\x14\x15\x16\x18\x19\x1a\x1b\x1c\x20\x21\x32\x33\x34\x35\x36\x38\x40\x41\x42\x43\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58[\x60\x81\x82\x90\x91\x93\x96\x97\x98\x99\x9a\x9b\x9c\x9e\xa0\xa1\xa2\xa3\xa4]|\x59................?[ -~]|\x96....$)` f/p2p/  i/eDonkey2000 or emule P2P filesharing generic signature/ 
+
+#other
+
+pcmatch mute m`^(Public|AES)Key: [0-9a-f]*\x0aEnd(Public|AES)Key\x0a$`	f/p2p/	i/MUTE P2P filesharing mute-net.sourceforge.net/ 
+pcmatch directconnect m`^(\$mynick |\$lock |\$key )`					f/p2p/	i/Direct Connect - P2P filesharing www.neo-modus.com/ f/p2p/
+pcmatch applejuice m`^ajprot\x0d\x0a` 							f/p2p/	i/Apple Juice P2P filesharing www.applejuicenet.de/ 
+
+;pmatch hotline m`^....................TRTPHOTL\x01\x02` a/Hotline - An old P2P filesharing protocol/ f/p2p/
+;pmatch kugoo m`^\x31..\x8e` p/KuGoo - a Chinese P2P program - http:www.kugoo.com/ c/p2p/
+;pmatch gnucleuslan m`gnuclear connect/[\x09-\x0d -~]*user-agent: gnucleus [\x09-\x0d -~]*lan:` p/GnucleusLAN - LAN-only P2P filesharing/ c/p2p/
+;pmatch thecircle m`^t\x03ni.?[\x01-\x06]?t[\x01-\x05]s[\x0a\x0b](glob|who are you$|query data)` p/The Circle - P2P application - http:thecircle.org.au/ c/open_source p2p/
+;pmatch imesh m`^(post[\x09-\x0d -~]*<PasswordHash>................................</PasswordHash><ClientVer>|\x34\x80?\x0d?\xfc\xff\x04|get[\x09-\x0d -~]*Host: imsh\.download-prod\.musicnet\.com|\x02(\x01|\x02)\x83.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?\x02(\x01|\x02)\x83)` p/iMesh - the native protocol of iMesh, a P2P application - http:imesh.com/ c/p2p/
+;pmatch freenet m`^\x01[\x08\x09][\x03\x04]` p/Freenet - Anonymous information retrieval - http:freenetproject.org/ c/p2p document_retrieval/
+;pmatch napster m`^(.[\x02\x06][!-~]+ [!-~]+ [0-9][0-9]?[0-9]?[0-9]?[0-9]? "[\x09-\x0d -~]+" ([0-9]|10)|1(send|get)[!-~]+ "[\x09-\x0d -~]+")` p/Napster - P2P filesharing/ c/p2p/
+;pmatch soulseek m`^(\x05..?|.\x01.[ -~]+\x01F..?.?.?.?.?.?.?)$` p/Soulseek - P2P filesharing - http:slsknet.org/ c/p2p/
+;pmatch xunlei m`^[()]...?.?.?(reg|get|query)` p/Xunlei - Chinese P2P filesharing - http:xunlei.com/ c/p2p/
+;pmatch tesla m`\x03\x9a\x89\x22\x31\x31\x31\.\x30\x30\x20\x42\x65\x74\x61\x20|\xe2\x3c\x69\x1e\x1c\xe9` p/Tesla Advanced Communication - P2P filesharing (?)/ c/p2p/
+;pmatch openft m`x-openftalias: [-)(0-9a-z ~.]` p/OpenFT - P2P filesharing (implemented in giFT library)/ c/p2p/
+;pmatch ares m`^\x03[]Z].?.?\x05$` p/Ares - P2P filesharing - http:aresgalaxy.sf.net/ c/p2p/
+;pmatch fasttrack m`^get (/.download/[ -~]*|/.supernode[ -~]|/.status[ -~]|/.network[ -~]*|/.files|/.hash=[0-9a-f]*/[ -~]*) http/1.1|user-agent: kazaa|x-kazaa(-username|-network|-ip|-supernodeip|-xferid|-xferuid|tag)|^give [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]?[0-9]?[0-9]?` p/FastTrack - P2P filesharing (Kazaa, Morpheus, iMesh, Grokster, etc)/ c/p2p/
+;pmatch 100bao m`^\x01\x01\x05\x0a` p/100bao - a Chinese P2P protocolprogram www.100bao.com/ f/p2p/
+
+
+;pmatch goboogy m`<peerplat>|^get /getfilebyhash\.cgi\?|^get /queue_register\.cgi\?|^get /getupdowninfo\.cgi\?` p/GoBoogy - a Korean P2P protocol/ c/p2p/
+;pmatch soribada m`^GETMP3\x0d\x0aFilename|^\x01.?.?.?(\x51\x3a\+|\x51\x32\x3a)|^\x10[\x14-\x16]\x10[\x15-\x17].?.?.?.?$` p/Soribada - A Korean P2P filesharing programprotocol - http:www.soribada.com/ c/p2p/
+;pmatch poco m`^\x80\x94\x0a\x01....\x1f\x9e` p/POCO and PP365 - Chinese P2P filesharing - http:pp365.com http:poco.cn/ c/p2p/
+;pmatch gnutella m`^(gnd[\x01\x02]?.?.?\x01|gnutella connect/[012]\.[0-9]\x0d\x0a|get /uri-res/n2r\?urn:sha1:|get /.*user-agent: (gtk-gnutella|bearshare|mactella|gnucleus|gnotella|limewire|imesh)|get /.*content-type: application/x-gnutella-packets|giv [0-9]*:[0-9a-f]*/|queue [0-9a-f]* [1-9][0-9]?[0-9]?\.[1-9][0-9]?[0-9]?\.[1-9][0-9]?[0-9]?\.[1-9][0-9]?[0-9]?:[1-9][0-9]?[0-9]?[0-9]?|gnutella.*content-type: application/x-gnutella|...................?lime)` p/Gnutella - P2P filesharing/ c/p2p/
+
+
+
+
+#=== GAMES ===
+
+#XBOX
+pcmatch xboxlive m`^\x58\x80........\xf3|^\x06\x58\x4e` f/game/ i/XBox Live - Console gaming/
+
+####FPS
+#Halflife 1
+pcmatch halflife m`^\xff\xff\xff\xffget(info|challenge)` f/game/ v/1/ i/FPS:Half Life 1 engine games : DOD, Counterstrike/
+pcmatch halflife m`\xff\xff\xff\xffinfostringresponse\x00\\protocol\\(\d+)\\.+\\description\\([^\\]+)` f/game/ v/$1/ i/FPS:Halflife game $2/
+
+
+
+#HL2
+pcmatch halflife m`^\xff\xff\xff\xff.*cstrikeCounter-Strike` f/game/ v/2/ i/FPS:Counterstrike (using the new "Source" engine)/
+pcmatch halflife m`^\xff\xff\xff\xff.*hl2mpDeathpmatch`      f/game/ v/2/ i/FPS:Half-Life 2 Deathpmatch - popular computer game/
+pcmatch halflife m`^\xff\xff\xff\xff.*dodDay of Defeat`      f/game/ v/2/ i/FPS:Day of Defeat: Source/ 
+#BF
+pcmatch battlefield m`^(\x11\x20\x01\xa0\x98\x11|\xfe\xfd.?.?.?.?.?.?(\x14\x01\x06|\xff\xff\xff))|[]\x01].?battlefield2` f/game/ v/2/ i/FPS:Battlefield by EA game/
+pcmatch battlefield m`^\x01\x11\x10\|\xf8\x02\x10\x40\x06` f/game/ v/1942/ i/FPS:Battlefield 1942 - An EA game/
+#Quake
+pcmatch quake m`^\x80\x0c\x01quake\x03` f/game/ v/1/ i/FPS:Quake by ID software/
+#Doom
+pcmatch doom3 m`^\xff\xffchallenge` f/game/ i/FPS:Doom 3 by ID software/
+
+
+###MMORPG
+
+#WOW
+pcmatch worldofwarcraft m`^\x06\xec\x01` f/game/ i/MMORPG:World of Warcraft/
+
+##misc
+</trafficPattern>
+
+
+

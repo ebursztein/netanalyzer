@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# netAnalyzer - main build script
+# -----------------------
+#
+# This script determines OS name and checks for the appropriate
+# makefile in mk/.
+#
+# inspired by the makefile system of Michal Zalewski <lcamtuf@coredump.cx>
+# (C) Copyright 2008  by Elie Bursztein <elie@bursztein.net>
+#
+
+
+SYSTEM=`uname -s 2>/dev/null`
+
+test "$SYSTEM" = "" && SYSTEM="unknown"
+
+echo "Your system type is: $SYSTEM"
+
+if [ ! -f mk/$SYSTEM ]; then
+  echo
+  echo "This system is not currently supported. You can try to compile the"
+  echo "program by trying one of the other supported options:"
+  echo
+  cd mk
+  ls | cat
+  echo 
+  echo "To do so, type 'make -f mk/XXX' or 'gmake -f mk/XXX', where XXX is the"
+  echo "name of the system you have selected (case sensitive). If you manage to"
+  echo "successfully compile the program, please let us know!"
+  echo
+  exit 1
+fi
+
+GMAKE_OK=`which gmake 2>/dev/null`
+
+if [ ! -x "$GMAKE_OK" ]; then
+  echo "GNU make not found; failing back to regular (BSD?) make."
+  exec make -f mk/$SYSTEM "$@"
+else
+  echo "GNU make found at $GMAKE_OK, trying to use it..."
+  exec gmake -f mk/$SYSTEM "$@"
+fi
+
+echo "Error: failed to execute gmake or make."
+
+exit 1

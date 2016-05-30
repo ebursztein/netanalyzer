@@ -1,0 +1,25 @@
+// NetAnalyzer Signatures file
+// Project page: http://code.google.com/p/netanalyzer/
+// Author: Elie Bursztein LSV, ENS-Cachan, CNRS, INRIA
+// Email: elie@bursztein.eu
+// Licence: GPL v2 
+// netAnalyzer is (C) Copyright 2008  by Elie Bursztein 
+#Taken from nmap nmap-service-probes configuration file
+<trafficPattern>
+pcmatch ftp m/^220 Welcome to ([-.\w]+) FTP.*\r\n$/i i/$1/ p/ftp/
+pcmatch ftp m/^220 ([-.\w]+) [-.\w ]+ftp.*\r\n$/i i/$1/ p/ftp/
+pcmatch ftp m/^220-([-.\w]+) [-.\w ]+ftp.*\r\n220/i i/$1/ p/ftp/
+pcmatch ftp m/^220 [-.\w ]+ftp.*\r\n$/i p/ftp/
+pcmatch ftp m/^220-[-.\w ]+ftp.*\r\n220/i p/ftp/
+pcmatch ftp m/^220[- ].*ftp server.*\r\n/i p/ftp/
+pcmatch ftp m/^220-\r?\n220 - ftp/i p/ftp/
+pcmatch imap m/^\* OK ([-.\w]+) [-.\w,:+ ]+imap[-.\w,:+ ]+\r\n$/i a/$1/ p/imap/
+pcmatch imap m/^\* OK [-.\w,:+ ]+imap[-.\w,:+ ]+\r\n$/i p/imap/
+pcmatch napster m|^1$| p|napster|
+pcmatch nntp m|^200 [-\[\]\(\)!,/+:<>@.\w ]*nntp[-\[\]\(\)!,/+:<>@.\w ]*\r\n$| p|nntp|
+pcmatch pop3 m|^\+OK [-\[\]\(\)!,/+:<>@.\w ]+\r\n$| p|pop3|
+pcmatch smtp m|^220[\s-].*?E?SMTP[^\r]*\r\n| p|smtp|
+pcmatch smtp m|^572 Relay not authorized\r\n| i/Relay not authorized/ p|smtp|
+pcmatch ssh m/^SSH-([.\d]+)-/ i/protocol $1/ p|ssh|
+pcmatch vnc m/RFB \d\d(\d)\.\d\d\d\n/ i/protocol $1/ p|vnc|
+<trafficPattern>

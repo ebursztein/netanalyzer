@@ -1,0 +1,26 @@
+// NetAnalyzer Signatures file
+// Project page: http://code.google.com/p/netanalyzer/
+// Author: Elie Bursztein LSV, ENS-Cachan, CNRS, INRIA
+// Email: elie@bursztein.eu
+// Licence: GPL v2 
+// netAnalyzer is (C) Copyright 2008  by Elie Bursztein
+
+#order rules from most exact rule to most generic 
+# fcrule file control rule keyword
+# n for filename
+# e for the file extension (mandatory)
+# f for the file family : image, sound, video, text, archive ... (mandatory)
+# s for the file supposed size
+# t for the average predicated entropy
+# h for information found in file headers (compression ratio)
+# i for additionnal information
+<trafficPattern>
+##http
+;fcmatch http m`GET ([^ ]+) HTTP/\d+\.\d+.*Host: +([-A-Za-z0-9_.]+).*Cookie: ([^\r]+)` n/$2 $1/ i/$3/
+fcmatch http m`GET ([^ ]+) HTTP/\d+\.\d+.*Host: +([^\r]+).*Referer: +([^\r]+)`s n/$2$1/ i/Referer:"$3"/
+fcmatch http m`GET ([^ ]+) HTTP/\d+\.\d+.*Host: +([^\r]+)`s n/$2$1/
+;default is nothing else match
+fcmatch http m`GET ([^ ]+) HTTP/\d+\.\d+` n/$1/
+fcmatch http m`HEAD ([^ ]+) HTTP/\d+\.\d+` n/$1/ i/HEAD request/
+</trafficPattern>
+

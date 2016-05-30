@@ -1,0 +1,18 @@
+// NetAnalyzer Signatures file
+// Project page: http://code.google.com/p/netanalyzer/
+// Author: Elie Bursztein LSV, ENS-Cachan, CNRS, INRIA
+// Email: elie@bursztein.eu
+// Licence: GPL v2 
+// netAnalyzer is (C) Copyright 2008  by Elie Bursztein 
+
+#A or E: the name of the event/error. Use A to triggers Alarm and E to report an event
+#G: Group e.g Leak, spoof, policy violation etc
+#D: Details about the error
+#T: Target of the error e.g user, protocol etc
+#C: Classification 
+pcmatch m'GET /nice%20ports%2C/Tri%6Eity.txt%2ebak HTTP/1.0\r\n\r\n' f/scan/  A/Nmap scan/ G/scan/ D/Nmap version probe FourOhFourRequest/ T/computer/
+
+
+//Graylisting to add
+//.fr[138.231.176.4]:25, delay=31, delays=0.15/0.17/30/0.13, dsn=4.0.0, status=deferred (host //ariane.ens-cachan.fr[138.231.176.4] said: 450 <xxxx@lsv.ens-cachan.fr>: Recipient address rejected: Greylisted for 5 //minutes (in reply to RCPT TO command))
+

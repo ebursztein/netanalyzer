@@ -1,0 +1,84 @@
+#
+# netAnalyzer - FreeBSD Makefile
+# ----------------------------------------------
+#
+# inspired by the makefile system of Michal Zalewski <lcamtuf@coredump.cx>
+# (C) Copyright 2008  by Elie Bursztein <elie@bursztein.net>
+
+CC      = gcc
+LIBS	=  -lpcap -I/usr/include/pcap -I/usr/local/include/pcap -pthread
+STRIP   = strip
+CFLAGS  = -D_REENTRANT  -D_THREAD_SAFE -Wall -g
+#CFLAGS  = -D_REENTRANT  -D_THREAD_SAFE -O3 -Wall -fomit-frame-pointer -funroll-loops
+NAME	= netAnalyzer
+SRC=    collector_thread.c\
+        decoder_thread.c\
+        stateful_thread.c\
+        traffic_thread.c\
+        application_thread.c\
+        output_thread.c\
+        util.c\
+        socket.c\
+	bench.c\
+	fifo_function.c\
+        decoder/decode_arp.c\
+        decoder/decode_ether.c\
+        decoder/decode_icmp.c\
+        decoder/decode_ip.c\
+        decoder/decode_tcp.c\
+        decoder/decode_udp.c\
+        parser/parser_main.c\
+        parser/parser_traffic_pattern.c\
+        parser/parser_main_block.c\
+        parser/parser_tuning.c\
+        parser/parser_service.c\
+        parser/parser_macprefix.c\
+        output/common_function.c\
+	output/livedump.c\
+	output/session.c\
+	output/proto.c\
+	output/host.c\
+	output/soft.c\
+	output/user.c\
+	output/user2user.c\
+	output/error.c\
+        software_function.c\
+        session_function.c\
+	host_function.c\
+	user_function.c\
+	user2user_function.c\
+	gateway_function.c\
+	macprefix_function.c\
+	entropy_function.c\
+	traffic_analyze_function.c\
+	traffic_profile_function.c\
+	traffic_pattern_function.c\
+	traffic_analyze_protocol_detecion.c\
+        protocol_function.c\
+        hash_functions.c\
+        error_function.c\
+        main.c
+regular:    $(NAME)
+
+all:	clean $(NAME)
+
+static: $(NAME)-static
+
+OBJ     = $(SRC:.c=.o)
+$(NAME)         : $(OBJ)
+									$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBS)
+
+$(NAME)-static	: $(OBJ) 
+	$(CC) -static $(CFLAGS) -o $(NAME) $(OBJ) $(LIBS)
+
+strip:
+	strip $(NAME) 2>/dev/null || true
+
+clean:
+	rm -f core core.[0123456789]* *.bak *~ *.o $(NAME) a.out $(NAME)-static 
+
+makedist: clean
+	cd ..;tar cfvz /tmp/netprof.tgz netprof
+	
+install: $(NAME)
+	./install.sh

@@ -1,0 +1,49 @@
+// NetAnalyzer Signatures file
+// Project page: http://code.google.com/p/netanalyzer/
+// Author: Elie Bursztein LSV, ENS-Cachan, CNRS, INRIA
+// Email: elie@bursztein.eu
+// Licence: GPL v2 
+// netAnalyzer is (C) Copyright 2008  by Elie Bursztein 
+
+# fdrule file control rule keyword
+# n for filename
+# e for the file extension (mandatory)
+# f for the file family : image, sound, video, text, archive ... (mandatory)
+# s for the file supposed size
+# t for the average predicated entropy
+# h for information found in file headers (compression ratio)
+# i for additionnal information
+
+<trafficPattern>
+#INFORMATIiN
+fdmatch web m`^[FC]WS[\x01-\x08]`	e/.sw/		f/web/	i/Flash - Macromedia Flash/ 
+
+#IMAGES
+
+fdmatch image m`GIF8(7|9)a`	e/.gif/ 	f/image/ 	i/GIF - Popular Image format/  
+fdmatch image m`\xff\xd8`  	e/.jpeg/ 	f/image/ 	i/JPEG - Joint Picture Expert Group image format/
+
+#MUSIC
+
+fdmatch music m`oggs.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?\x01vorbis` e/.ogg/ f/music/ i/Ogg - Ogg Vorbis music/ t/file/
+
+#VIDEO
+
+
+#TEXT 
+
+fdmatch textfile m`%PDF-1\.([0-9]+)` 			e/.pdf/		f/text/		i/PDF - version $1 - Portable Document Format - Postscript-like format by Adobe/ 
+fdmatch textfile m`{\\rtf[12]` 				e/.rtf/		f/text/		i/RTF - Rich Text Format - an open document format/ 
+fdmatch textfile m`%!ps` 				e/.ps/		f/text/		i/Postscript - Printing Language/ 
+fdmatch web m`<html>.*<head>`i          		e/.html/ 	f/text/		i/(X)HTML - (Extensible) Hypertext Markup Language/
+
+#ARCHIVE
+fdmatch archive m`pk\x03\x04\x14` 			e/.zip/		f/archive/	i/ZIP - (PK|Win)Zip archive format/
+fdmatch archive m`rar\x21\x1a\x07` 			e/.rar/		f/archive/	i/RAR - The WinRAR archive format/ 
+fdmatch archive m`ustar` 				e/.tar/		f/archive/	i/Tar - UNIX file archiver./ 
+fdmatch archive m`\xed\xab\xee\xdb.?.?.?.?([1-7]+)`	e/.rpm/ 	f/archive/	i/RPM - version $1 - Redhat Package Management packages/ 
+
+#PROGRAMM
+fdmatch programm m`\x4d\x5a(\x90\x03|\x50\x02)\x04` 	e/.exe/		f/program/	i/Executable - Microsoft PE file format/ 
+fdmatch programm m`\#! ?/(usr/(local/)?)?bin/perl` 	e/.pl/		f/program/	i/Perl - A scripting language by Larry Wall/
+</trafficPattern>
