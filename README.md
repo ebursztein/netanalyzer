@@ -1,0 +1,2 @@
+# netanalyzer
+netAnalyzer is a multi-threaded statefull passive network analyzer that can be used to troubleshoot and analyze network behavior. It aim at providing network information from various perspective ranging from network sessions to network error. Its flexibility allows to have the most effective vision of the network for a given task. It use a signature engine to grab relevant information from packets payload
